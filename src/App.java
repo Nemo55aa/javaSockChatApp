@@ -14,26 +14,24 @@ import java.util.TimerTask;
 
 // ownLib
 import myThread.refreshTh;
-
-
+import sockThread.srvSockTh;
 
 public class App {
-    static GreetServer srv;
     public static void main(String[] args) throws IOException   {
-        String tmpString;
-        srv = new GreetServer();
         MyFrame f = new MyFrame();
+        
         f.l1.setText("waiting Connection from Client...");
         f.setVisible(true);
         //tmpString = srv.start(8000);
         //^f.l1.setText("received: " + tmpString);
 
-        refreshTh refTh = new refreshTh();
+        //refreshTh refTh = new refreshTh();
         
         Timer time = new Timer();
 
-        refTh.start();
+        //refTh.start();
         
+        /* 
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {}
@@ -41,7 +39,7 @@ public class App {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {}
-        refTh.setIntval(20);
+        refTh.setIntval(20);*/
 
         time.scheduleAtFixedRate(new myTimerTsk(), 0, 5000);
 
@@ -56,7 +54,12 @@ class MyFrame extends JFrame implements ActionListener{
     JLabel l1;
     JTextField tf1;
     int width, height;
+    
+    srvSockTh srv;
+    
     public MyFrame() {
+        // ==================== STYLING WINDOW ====================
+        {
         Container contentPane = getContentPane();
         b1 = new JButton("Button1");
         l1 = new JLabel("label");
@@ -68,32 +71,38 @@ class MyFrame extends JFrame implements ActionListener{
         setSize(width, height);
         setTitle("My Window Application");
         
-        contentPane.setLayout(null);
+        contentPane.setLayout(new BorderLayout());
         
         panel.setBounds(0,0,width, height);
         panel.setPreferredSize(new Dimension(600, 300));;
-        contentPane.add(panel);
+        contentPane.add("North", panel);
 
         b1.setBounds(10, 10, 100, 30);
-        contentPane.add(b1);
+        contentPane.add("West",b1);
         
         l1.setBounds(10, 45, 200, 30);
-        contentPane.add(l1);
+        contentPane.add("Center",l1);
         
         //tf1.setBounds(10, 55, 100, 30);
-        contentPane.setLayout(new FlowLayout(FlowLayout.LEADING));
-        contentPane.add(tf1);
-        
-
+        //contentPane.setLayout(new FlowLayout(FlowLayout.LEADING));
+        contentPane.add("South",tf1);
         b1.addActionListener(this);
         addWindowListener(new MyWindowAdapter());
+        }
+
+        // ==================== STARTING SERVER ====================
+        srv = new srvSockTh();
+        srv.start();
+        
     }
-    
+
     public void actionPerformed(ActionEvent ae){
     if (ae.getSource() == b1) 
         System.out.println("b1ActionEvent called");
-        l1.setText(tf1.getText());
+        //l1.setText(tf1.getText());
         //l1.setText("Button Pressed");
+
+        l1.setText(srv.readLineStr());
     }
 }
 /**
@@ -137,6 +146,7 @@ class myTimerTsk extends TimerTask {
 
   
 // ================== socket ================== 
+/*
 class GreetServer {
     private ServerSocket serverSocket;
     private Socket clientSocket;
@@ -176,3 +186,4 @@ class GreetServer {
     }
 }
 
+ */
