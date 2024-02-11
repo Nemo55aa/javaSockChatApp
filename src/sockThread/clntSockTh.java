@@ -4,8 +4,7 @@ package sockThread;
 import java.net.*;
 import java.io.*;
 
-public class srvSockTh extends Thread {
-    private ServerSocket serverSocket;
+public class clntSockTh extends Thread {
     private Socket clientSocket;
 
     // string buffer
@@ -13,19 +12,14 @@ public class srvSockTh extends Thread {
     private BufferedReader in;
     public String lineStrBuf;
 
-    public srvSockTh(){
+    public clntSockTh(){
         lineStrBuf = null;
-        serverSocket = null;
         clientSocket = null;
-
-        // for future...I'm gonna fix this as finding available available port and use that.....maybe..(240211)
-        this.start(8000);
     }
-    public srvSockTh(int listeningPort){
+    public clntSockTh(String ip, int port){
         lineStrBuf = null;
-        serverSocket = null;
         clientSocket = null;
-        this.start(listeningPort);
+        connect(ip, port);
     }
 
     public String readLineStr(){
@@ -40,7 +34,7 @@ public class srvSockTh extends Thread {
             }
         }
     }
-    public boolean isClientConnected(){
+    public boolean isConnected(){
         if(clientSocket != null){
             return true;
         } else {
@@ -48,22 +42,24 @@ public class srvSockTh extends Thread {
         }
     }
 
-    private void start(int port) {
+    private void connect(String ip, int port) {
         try{
-            serverSocket = new ServerSocket(port);
-        }catch(IOException e) {
+            clientSocket = new Socket(ip, port);
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));   
+        }catch(IOException e){
             e.printStackTrace();
         }
     }
+
+
 
     private void ending() {
         try{
             in.close();
             out.close();
             clientSocket.close();
-            serverSocket.close();
             clientSocket = null;
-            serverSocket = null;
         }catch(IOException e){
             e.printStackTrace();
         }
@@ -73,11 +69,6 @@ public class srvSockTh extends Thread {
     public void run(){
         while(true){            // do accepting and receiving here
             try {
-                if(clientSocket == null){                  // When anyone DOESN'T connected to me am server, just being welcome;
-                    clientSocket = serverSocket.accept();
-                    out = new PrintWriter(clientSocket.getOutputStream(), true);
-                    in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                }
                 if(clientSocket != null){                  // When someone DO connected to me am server, focusing to read buffer;
                 //if(isConnected(clientSocket)){
                     lineStrBuf = in.readLine();
@@ -92,3 +83,20 @@ public class srvSockTh extends Thread {
     
 }
 
+/*
+// ================== socket ================== 
+class GreetClient {
+
+
+    public void stopConnection() {
+        try {
+            in.close();
+            out.close();
+            clientSocket.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+ */
