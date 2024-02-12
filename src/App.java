@@ -41,7 +41,6 @@ public class App {
 
 // ================== swing ================== 
 class MyFrame extends JFrame implements ActionListener{
-    mypanel panel;
     JButton readbutton, sendButton;
     JLabel l1;
     JTextField tf1;
@@ -72,18 +71,13 @@ class MyFrame extends JFrame implements ActionListener{
         textJPanel.add("Center", ta1);
         textJPanel.add("South", tf1);
 
-        panel = new mypanel();
-        
-        
         width = 640; height = 480;
         setSize(width, height);
         setTitle("ServerSide App");
         
         contentPane.setLayout(new BorderLayout());
-        contentPane.add("North", panel);
         contentPane.add("West", buttonsJPanel);
         contentPane.add("Center",textJPanel);
-        //contentPane.add("South",tf1);
 
         readbutton.addActionListener(this);
         sendButton.addActionListener(this);
@@ -95,8 +89,6 @@ class MyFrame extends JFrame implements ActionListener{
         srv.start();
         
     }
-
-
 
     public void actionPerformed(ActionEvent ae){
         if (ae.getSource() == readbutton) {
@@ -123,10 +115,5 @@ class MyFrame extends JFrame implements ActionListener{
 class MyWindowAdapter extends WindowAdapter {
     public void windowClosing(WindowEvent e) {
         System.exit(0);
-    }
-}
-class mypanel extends JPanel{
-    public void paintComponent(Graphics g) {
-    g.drawLine(0,0,200,200);
     }
 }
