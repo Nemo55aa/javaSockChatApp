@@ -25,6 +25,11 @@ public class clntSockTh extends Thread {
     public String readLineStr(){
         return this.lineStrBuf;
     }
+    public String readLineStrClear(){
+        String tmpString = this.lineStrBuf;
+        this.lineStrBuf = null;
+        return tmpString;
+    }
     public void sendLineStr(String msg) {
         if(clientSocket != null){
             try {

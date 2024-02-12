@@ -23,14 +23,19 @@ public class App {
         f.l1.setText("waiting Connection from Client...");
         f.setVisible(true);
         
+        while(true){
+            // Checking/Displaying Connection between me and Client.
+            if(f.srv.isClientConnected()){
+                f.l1.setText("connected!");
+            }else{
+                f.l1.setText("not connected...");
+            }
 
+            if(f.srv.lineStrBuf != null){
+                f.readbutton.doClick();
+            }
+        }
         
-        Timer time = new Timer();
-
-
-        time.scheduleAtFixedRate(new myTimerTsk(), 0, 5000);
-
-        //System.out.println("Hello, World!");
     }
 }
 
@@ -40,6 +45,7 @@ class MyFrame extends JFrame implements ActionListener{
     JButton readbutton, sendButton;
     JLabel l1;
     JTextField tf1;
+    JTextArea ta1;
     int width, height;
     
     srvSockTh srv;
@@ -48,22 +54,36 @@ class MyFrame extends JFrame implements ActionListener{
         // ==================== STYLING WINDOW ====================
         {
         Container contentPane = getContentPane();
-        readbutton = new JButton("read server's receiving Buffer");
-        sendButton = new JButton("send text to Client");
-        l1 = new JLabel("label");
-        tf1 = new JTextField("input Text here!");
-        panel = new mypanel();
+        
+        JPanel buttonsJPanel = new JPanel();
+        readbutton = new JButton("read Line");
+        sendButton = new JButton("send Line");
+        buttonsJPanel.setLayout(new GridLayout(2,1));
+        buttonsJPanel.add(readbutton);
+        buttonsJPanel.add(sendButton);
 
+        JPanel textJPanel = new JPanel();
+        l1 = new JLabel("label");
+        ta1 = new JTextArea(100, 100);
+        ta1.setEditable(false);
+        tf1 = new JTextField("input Text here!");
+        textJPanel.setLayout(new BorderLayout());
+        textJPanel.add("North", l1);
+        textJPanel.add("Center", ta1);
+        textJPanel.add("South", tf1);
+
+        panel = new mypanel();
+        
+        
         width = 640; height = 480;
         setSize(width, height);
-        setTitle("My Window Application");
+        setTitle("ServerSide App");
         
         contentPane.setLayout(new BorderLayout());
         contentPane.add("North", panel);
-        contentPane.add("West",readbutton);
-        contentPane.add("East",sendButton);
-        contentPane.add("Center",l1);
-        contentPane.add("South",tf1);
+        contentPane.add("West", buttonsJPanel);
+        contentPane.add("Center",textJPanel);
+        //contentPane.add("South",tf1);
 
         readbutton.addActionListener(this);
         sendButton.addActionListener(this);
@@ -76,16 +96,20 @@ class MyFrame extends JFrame implements ActionListener{
         
     }
 
+
+
     public void actionPerformed(ActionEvent ae){
         if (ae.getSource() == readbutton) {
-            String tmpString = srv.readLineStr();
+            String tmpString = srv.readLineStrClear();
             System.out.print("I read :");
             System.out.println(tmpString);
-            //l1.setText("I read:" + tmpString);
-            l1.setText(tmpString);
+            if(tmpString != null){
+                ta1.append(new Date() + ": " + tmpString + '\n');
+            }
         }
         if (ae.getSource() == sendButton) {
             String tmpString = tf1.getText(); 
+            tf1.setText(null);
             srv.sendLineStr(tmpString);
             System.out.print("I sent :");
             System.out.println(tmpString);
@@ -106,71 +130,3 @@ class mypanel extends JPanel{
     g.drawLine(0,0,200,200);
     }
 }
-
-class myTimerTsk extends TimerTask {
-
-    // 実行回数
-    static int i = 1;
-  
-    public void run() {
-      try {
-  
-        System.out.println("-----------------------------------------");
-        System.out.println(i + "回目タスク開始" + new Date());
-  
-        //3秒間停止する
-        Thread.sleep(3000);
-  
-        System.out.println(i + "回目タスク終了" + new Date());
-  
-        i = i + 1;
-  
-      } catch (Exception ex) {
-        ex.printStackTrace();
-      }
-    }
-  }
-
-  
-// ================== socket ================== 
-/*
-class GreetServer {
-    private ServerSocket serverSocket;
-    private Socket clientSocket;
-    private PrintWriter out;
-    private BufferedReader in;
-    //private acceptTh acTh;\
-    String greeting;
-
-    public String start(int port) {
-        try{
-            serverSocket = new ServerSocket(port);
-            clientSocket = serverSocket.accept();
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            greeting = in.readLine();
-            if ("hello server".equals(greeting)) {
-                System.out.println("hello client");
-            }
-            else {
-                System.out.println("unrecognised greeting");
-            }
-        }catch(IOException e) {
-            e.printStackTrace();
-        }
-        return greeting;
-    }
-
-    public void stop() {
-        try{
-            in.close();
-            out.close();
-            clientSocket.close();
-            serverSocket.close();
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-    }
-}
-
- */
